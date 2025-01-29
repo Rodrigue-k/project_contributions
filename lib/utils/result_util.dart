@@ -99,15 +99,32 @@ class ResultState extends ConsumerState<Result> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            login,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black.withValues(alpha: 0.6)),
+                          Row(
+                            children: [
+                              Text(
+                                name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '@$login',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
                           Text(
                             '${percentage.toStringAsFixed(1)}%',
-                            style: const TextStyle(color: Colors.grey),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
