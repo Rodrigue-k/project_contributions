@@ -58,6 +58,10 @@ class GithubState {
 class GithubStateNotifier extends StateNotifier<GithubState> {
   GithubStateNotifier() : super(GithubState());
 
+ bool isReadyToFalse (){
+   state = state.copyWith(isReady: false);
+   return state.isReady;
+ }
 
   Future<bool> validateToken(String token) async {
     try {
@@ -112,7 +116,6 @@ class GithubStateNotifier extends StateNotifier<GithubState> {
     try {
       state = state.copyWith(isLoading: true, error: '', processedCommits: 0);
 
-      // Valide le token et le dépôt avant de continuer
       if (!await validateToken(token) || !await validateRepo(owner, repo, token)) {
         state = state.copyWith(isLoading: false);
         return;
@@ -125,7 +128,6 @@ class GithubStateNotifier extends StateNotifier<GithubState> {
       List<Commit> commits = [];
       List<Map<String, String>> avatarUrls = [];
 
-      // Récupère toutes les pages de commits
       while (url.isNotEmpty) {
         final response = await http.get(Uri.parse(url), headers: headers);
 
@@ -137,7 +139,6 @@ class GithubStateNotifier extends StateNotifier<GithubState> {
         final jsonResponse = jsonDecode(response.body) as List;
         commits.addAll(jsonResponse.map((data) => Commit.fromJson(data)).toList());
 
-        // Récupère les URLs des avatars des auteurs
         avatarUrls.addAll(
           jsonResponse.map((data) {
             return {
@@ -154,9 +155,6 @@ class GithubStateNotifier extends StateNotifier<GithubState> {
       }
 
       state = state.copyWith(totalCommits: commits.length, avatarUrls: avatarUrls, isProgressing: true);
-      if (kDebugMode) {
-        print("isProgressing: ${state.isProgressing}");
-      }
 
       print("Commits récupérés avec succès: ${commits.length}");
       // Récupère les détails de chaque commit
@@ -167,12 +165,7 @@ class GithubStateNotifier extends StateNotifier<GithubState> {
 
             if (commitResponse.statusCode == 200) {
               final commitDetails = jsonDecode(commitResponse.body);
-              if (kDebugMode) {
-                print(state.processedCommits);
-              }
               state = state.copyWith(processedCommits: state.processedCommits + 1);
-
-             // print("Commit récupéré avec succès: ${commitDetails['sha']}");
               return Commit.fromJson(commitDetails);
             } else {
               print("Erreur lors de la récupération des détails du commit: ${commitResponse.statusCode}");
@@ -190,7 +183,6 @@ class GithubStateNotifier extends StateNotifier<GithubState> {
         isReady: true,
         commits: detailedCommits.whereType<Commit>().toList(),
       );
-      print(state.commits);
     } catch (e) {
       print("Erreur lors de la récupération des commits: $e");
       state = state.copyWith(error: "Erreur lors de la récupération des commits: ${e.toString()}");
