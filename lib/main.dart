@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:project_contributions/presentations/login.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:project_contributions/presentations/main_screen.dart';
+import 'package:project_contributions/presentations/screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  
+  runApp(ProviderScope(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -18,7 +21,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF021124)),
         useMaterial3: true,
       ),
-      home: const Login(),
+      home: const MainScreen(),
     );
   }
 }
