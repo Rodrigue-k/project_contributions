@@ -8,17 +8,14 @@ import 'package:project_contributions/Providers/github_provider.dart';
 import '../presentations/ressourses/app_colors.dart';
 
 
-class PieChartSample3 extends ConsumerStatefulWidget {
-  const PieChartSample3({super.key});
+class Result extends ConsumerStatefulWidget {
+  const Result({super.key});
 
   @override
-  PieChartSample3State createState() => PieChartSample3State();
+  ResultState createState() => ResultState();
 }
 
-class PieChartSample3State extends ConsumerState<PieChartSample3> {
-  List<Map<String, String>> get avatarUrls =>
-      ref.watch(githubProvider).avatarUrls;
-
+class ResultState extends ConsumerState<Result> {
   int touchedIndex = 0;
 
   @override
@@ -51,7 +48,13 @@ class PieChartSample3State extends ConsumerState<PieChartSample3> {
   }
 
   List<PieChartSectionData> showingSections() {
-    if (avatarUrls.isEmpty) {
+    List<Map<String, String>> avatarUrls = ref.watch(githubProvider).avatarUrls;
+    final Map<String, double> contributions = ref.watch(githubProvider).contributions;
+
+    print("Avatar URLs: $avatarUrls");
+    print("Contributions: $contributions");
+
+    if (contributions.isEmpty) {
       return [
         PieChartSectionData(
           color: AppColors.contentColorBlue,
@@ -67,21 +70,30 @@ class PieChartSample3State extends ConsumerState<PieChartSample3> {
       ];
     }
 
-    final totalContributions = avatarUrls.length;
+    final double totalContributions = contributions.values.fold(0, (sum, value) => sum + value);
+    final List<String> logins = contributions.keys.toList();
 
-    return List.generate(avatarUrls.length, (i) {
+    return List.generate(contributions.length, (i) {
+      final login = logins[i];
+      final contributionValue = contributions[login] ?? 0.0;
+
       final isTouched = i == touchedIndex;
       final fontSize = isTouched ? 20.0 : 16.0;
       final radius = isTouched ? 110.0 : 100.0;
       final widgetSize = isTouched ? 55.0 : 40.0;
 
-      final author = avatarUrls[i];
-      final value = 100 / totalContributions;
+      final avatarEntry = avatarUrls.firstWhere(
+            (avatar) => avatar['login'] == login,
+        orElse: () => {'avatar_url': ''},
+      );
+      final avatarUrl = avatarEntry['avatar_url'] ?? '';
+
+      print("Login: $login - Avatar URL: $avatarUrl");
 
       return PieChartSectionData(
         color: _getColorForIndex(i),
-        value: value,
-        title: '${value.toStringAsFixed(1)}%',
+        value: (contributionValue / totalContributions) * 100,
+        title: '${(contributionValue / totalContributions * 100).toStringAsFixed(1)}%',
         radius: radius,
         titleStyle: TextStyle(
           fontSize: fontSize,
@@ -89,7 +101,7 @@ class PieChartSample3State extends ConsumerState<PieChartSample3> {
           color: Colors.white,
         ),
         badgeWidget: _Badge(
-          author['avatar_url'] ?? '',
+          avatarUrl,
           size: widgetSize,
           borderColor: AppColors.contentColorBlack,
         ),
@@ -97,6 +109,9 @@ class PieChartSample3State extends ConsumerState<PieChartSample3> {
       );
     });
   }
+
+
+
 
   Color _getColorForIndex(int index) {
     // Retourne une couleur différente pour chaque section
