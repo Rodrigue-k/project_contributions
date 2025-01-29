@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:project_contributions/presentations/main_screen.dart';
-import 'package:project_contributions/presentations/screen.dart';
 
 void main() {
   
