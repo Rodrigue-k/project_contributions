@@ -123,7 +123,10 @@ class GithubStateNotifier extends StateNotifier<GithubState> {
         state = state.copyWith(isLoading: false);
       }
 
-      final headers = {'Authorization': 'token $token'};
+      final headers = {
+        'Authorization': 'token $token',
+        'Accept': 'application/vnd.github.v3+json',
+      };
       String url = 'https://api.github.com/repos/$owner/$repo/commits?per_page=100';
       List<Commit> commits = [];
       List<Map<String, String>> avatarUrls = [];
@@ -195,8 +198,8 @@ class GithubStateNotifier extends StateNotifier<GithubState> {
     Map<String, String> authorNameMap = {};
 
     for (var commit in commits) {
-      String name = commit.commit["author"]["name"];
-      String login = commit.author["login"];
+      String name = commit.commit["author"]["name"] ?? 'Unknown';
+      String login = commit.author?["login"] ?? 'Unknown';
 
       authorNameMap[login] = name;
 
