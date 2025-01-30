@@ -1,0 +1,33 @@
+name: Flutter Build for Windows
+
+on:
+  push:
+    branches:
+      - main  # Déclenche l'action sur un push vers 'main'
+  pull_request:
+    branches:
+      - main  # Déclenche aussi sur une pull request vers 'main'
+
+jobs:
+  build:
+    runs-on: windows-latest  # Utilise un environnement Windows
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows
+        run: flutter build windows --release  # Génère la build Windows en mode release
+
+      - name: Upload Windows build artifact
+        uses: actions/upload-artifact@v4  # ✅ Nouvelle version compatible
+        with:
+          name: windows-build
+          path: build/windows/runner/Release/
