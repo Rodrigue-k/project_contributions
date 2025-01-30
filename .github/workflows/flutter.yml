@@ -27,7 +27,7 @@ jobs:
         run: flutter build windows --release  
 
       - name: Upload Windows build artifact
-        uses: actions/upload-artifact@v4  # ✅ Mise à jour ici
+        uses: actions/upload-artifact@v4  
         with:
           name: windows-build
           path: build/windows/runner/Release/
